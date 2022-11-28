@@ -13,5 +13,6 @@ namespace Models.DataModels
         public IList<Material>? Materials { get; set; }
         public int DeliveryTime { get; set; }
         public int Priority { get; set; }
+        public string? Image { get; set; }
     }
 }

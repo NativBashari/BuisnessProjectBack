@@ -11,12 +11,10 @@ namespace BuisnessLogic.Services
     internal class CustomersHandling
     {
         private readonly int numOfQueues;
-        private readonly Action handling; // Not used now
         Semaphore semaphore;
-        public CustomersHandling(int numOfQueues, Action Handling)
+        public CustomersHandling(int numOfQueues)
         {
             this.numOfQueues = numOfQueues;
-            handling = Handling;
             semaphore = new Semaphore(numOfQueues, numOfQueues);
         }
         

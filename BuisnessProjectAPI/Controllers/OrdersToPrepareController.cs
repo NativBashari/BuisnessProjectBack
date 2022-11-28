@@ -9,12 +9,12 @@ namespace BuisnessProjectAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ServiceStationsController : ControllerBase
+    public class OrdersToPrepareController : ControllerBase
     {
-        private readonly IHubContext<ServiceStationsHub> _hubContext;
+        private readonly IHubContext<OrdersToPrepareHub> _hubContext;
         private readonly MainLogic _mainLogic;
 
-        public ServiceStationsController(IHubContext<ServiceStationsHub> hubContext, MainLogic mainLogic)
+        public OrdersToPrepareController(IHubContext<OrdersToPrepareHub> hubContext ,MainLogic mainLogic)
         {
             _hubContext = hubContext;
             _mainLogic = mainLogic;
@@ -22,9 +22,9 @@ namespace BuisnessProjectAPI.Controllers
 
         public IActionResult Get()
         {
-            var timerManager = new TimerManager(() => _hubContext.Clients.All.SendAsync("TransferServiceStationsData", _mainLogic.GetServiceStations()));
-            return Ok(new { Message = "Service stations Hub is connected" });
+            var timerManager = new TimerManager(() => _hubContext.Clients.All.SendAsync("TransferOrdersToPrepareData", _mainLogic.GetOrdersToPrepare()));
+            return Ok(new { Message = "Orders to prepare Hub is conected" });
         }
-        
+
     }
 }

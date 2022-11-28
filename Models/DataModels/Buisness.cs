@@ -11,9 +11,9 @@ namespace Models.DataModels
     {
         public int Id { get; set; }
         public string? Name { get; set; }
-        //public IList<ServiceStation>? Queues { get; set; }
         public int ServiceStations { get; set; }
         public IList<Product>? Products { get; set; }
         public int ProductionSlots { get; set; }
+        public int DelieveryTime { get; set; }
     }
 }

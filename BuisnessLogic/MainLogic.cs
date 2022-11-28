@@ -1,10 +1,9 @@
 ﻿using BuisnessLogic.Services;
 using DAL;
 using Generator;
+using Microsoft.AspNetCore.SignalR;
 using Models.DataModels;
 using Simulator;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Timers;
 using Timer = System.Timers.Timer;
 
@@ -12,19 +11,23 @@ namespace BuisnessLogic
 {
     public class MainLogic
     {
+        int customersCounter;
         Timer timerLoop;
-        ChooseQueue chooseQueue;
+        ChooseQueue chooseQueueForEnquque;
+        ChooseQueue chooseQueueForDequque;
         readonly DataService _dataService;
         readonly OrdersGenerator _ordersGenerator;
         readonly CustomersGenerator _customersGenerator;
         readonly CustomersHandling customersHandling;
         readonly OrdersHandling ordersHandling;
+        readonly DelieveryHandling delieveryHandling;
         Buisness buisness;
         private  Customer? enteredCustomer;
         private Order? order;
         private List<ServiceStation>? serviceStationList;
-        private List<Order> ordersToDelievery;
-
+        private List<Order> ordersToPrepare; // need thread-safety data structure
+        private List<Order> ordersToDelievery; // need thread-safety data structure
+        
 
         public Order Order
         {
@@ -32,6 +35,7 @@ namespace BuisnessLogic
             set { 
                 order = value;
                 Console.WriteLine($"The order is {order.Id}");
+                Task.Run(() => StartCustomerHandling());
                 StartOrderHandling();
             }
         }
@@ -44,7 +48,10 @@ namespace BuisnessLogic
                 enteredCustomer = value;
                 Console.WriteLine($"Customer {enteredCustomer.Id} entered the restaurant");
                 CustomerEnter(enteredCustomer);
-                StartCustomerHandling();
+                if(customersCounter < 1)
+                {
+                  Task.Run(() => StartCustomerHandling()); // Only for first call
+                }
             }
         }
    
@@ -55,14 +62,17 @@ namespace BuisnessLogic
             CreateServiceStations();
             _ordersGenerator = new OrdersGenerator();
             _customersGenerator = new CustomersGenerator();
-            customersHandling = new CustomersHandling(buisness.ServiceStations, StartCustomerHandling);
+            customersHandling = new CustomersHandling(buisness.ServiceStations);
             ordersHandling = new OrdersHandling(buisness.ProductionSlots, AddOrderToDelieveryList);
+            delieveryHandling = new DelieveryHandling(RemoveOrderFromDelieveryList, buisness.DelieveryTime);
             timerLoop = new Timer();
             timerLoop.Elapsed += GetCustomerWithOrder;  
-            timerLoop.Interval= 2000;
+            timerLoop.Interval= 9000;
             timerLoop.Enabled= true;
+            ordersToPrepare= new List<Order>();
             ordersToDelievery = new List<Order>();
-            chooseQueue = new ChooseQueue();
+            chooseQueueForEnquque = new ChooseQueue();
+            chooseQueueForDequque = new ChooseQueue();
         }
 
         private void CreateServiceStations()
@@ -83,27 +93,29 @@ namespace BuisnessLogic
         }
 
         private void CustomerEnter(Customer customer)
-        {       
-            serviceStationList[chooseQueue.GetQueueIndex(serviceStationList)].Customers.Enqueue(customer);
+        {
+            serviceStationList[chooseQueueForEnquque.GetQueueIndex(serviceStationList)].Customers!.Enqueue(customer);
             Console.WriteLine($"Customer {customer.Id} Is enter to queue");
         }
-        private async void StartCustomerHandling()
+        private async Task StartCustomerHandling()
         {
-            ServiceStation selectedServiceStation;
+            customersCounter++;
+            int selectedIndex;
             do
             {
-                selectedServiceStation = serviceStationList![chooseQueue.GetQueueIndex(serviceStationList)];
-            } while (selectedServiceStation.Customers!.Count < 2);
-           
-            var customer = customersHandling.CustomerDequeue(selectedServiceStation.Customers);
+                selectedIndex = chooseQueueForDequque.GetQueueIndex(serviceStationList);
+            }
+            while (serviceStationList[selectedIndex].Customers!.Count < 1);
+            var customer = customersHandling.CustomerDequeue(serviceStationList[selectedIndex].Customers!);
             if (customer == null) return;
-             Order =  Task.Run(async () => await customersHandling.CustomerHandlingAsync(customer)).Result;
+            Order =  Task.Run(() =>  customersHandling.CustomerHandlingAsync(customer)).Result;
+            ordersToPrepare.Add(Order);
         }
         private async void StartOrderHandling()
         {
             if (ordersHandling.CheckMaterialAvailability(Order, _dataService.Materials))
             {
-                ordersHandling.OrderHandlingAsync(Order);
+                Task.Run(() => ordersHandling.OrderHandlingAsync(Order));
             }
             else
             {
@@ -113,13 +125,27 @@ namespace BuisnessLogic
         }
         private void AddOrderToDelieveryList(Order order) // this is a delegate, Invoked from OrdersHandling service
         {
-
+            ordersToPrepare.Remove(order);
             ordersToDelievery.Add(order);
+            Task.Run(() => delieveryHandling.DelieveryHandler(order));
+        }
+
+        private void RemoveOrderFromDelieveryList(Order order) // this is a delegate, Invoked from Delievery Handling service
+        {
+            ordersToDelievery.Remove(order);
         }
 
         public List<ServiceStation> GetServiceStations()
         {
             return this.serviceStationList!;
+        }
+        public List<Order> GetOrdersToPrepare()
+        {
+            return this.ordersToPrepare;
+        }
+        public List<Order> GetOrdersToDelievery()
+        {
+            return this.ordersToDelievery;
         }
 
     }

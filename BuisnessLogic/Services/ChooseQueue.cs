@@ -10,9 +10,15 @@ namespace BuisnessLogic.Services
     internal  class ChooseQueue
     {
         Random r = new Random();
-        public  int GetQueueIndex(IList<ServiceStation> queues)
+        int index = 0;
+        public int GetQueueIndex(IList<ServiceStation> queues)
         {
-            var index = r.Next(0, queues.Count);
+            if(queues.Count - 1 == index)
+            {
+                index = 0;
+                return index;
+            }
+            index++;
             return index;
         }
     }

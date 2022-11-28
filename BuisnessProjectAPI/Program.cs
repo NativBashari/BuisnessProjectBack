@@ -30,6 +30,8 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
     endpoints.MapHub<ServiceStationsHub>("/ServiceStations");
+    endpoints.MapHub<OrdersToPrepareHub>("/OrdersToPrepare");
+    endpoints.MapHub<OrdersToDelieveryHub>("/OrdersToDelievery");
 }
 ) ;
 

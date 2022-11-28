@@ -13,7 +13,7 @@ namespace BuisnessProjectAPI.TimerFeatures
         {
             _action = action;
             _autoResetEvent= new AutoResetEvent(false);
-            _timer = new Timer(Execute, _autoResetEvent, 0, 3000);
+            _timer = new Timer(Execute, _autoResetEvent, 0, 1000);
         }
 
         private void Execute(object? state)
