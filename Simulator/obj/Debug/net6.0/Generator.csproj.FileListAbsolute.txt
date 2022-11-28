@@ -1,0 +1,15 @@
+C:\Users\CompieCourse\Desktop\BuisnessProject\Simulator\bin\Debug\net6.0\Generator.deps.json
+C:\Users\CompieCourse\Desktop\BuisnessProject\Simulator\bin\Debug\net6.0\Generator.dll
+C:\Users\CompieCourse\Desktop\BuisnessProject\Simulator\bin\Debug\net6.0\Generator.pdb
+C:\Users\CompieCourse\Desktop\BuisnessProject\Simulator\bin\Debug\net6.0\Models.dll
+C:\Users\CompieCourse\Desktop\BuisnessProject\Simulator\bin\Debug\net6.0\Models.pdb
+C:\Users\CompieCourse\Desktop\BuisnessProject\Simulator\obj\Debug\net6.0\Generator.csproj.AssemblyReference.cache
+C:\Users\CompieCourse\Desktop\BuisnessProject\Simulator\obj\Debug\net6.0\Generator.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\CompieCourse\Desktop\BuisnessProject\Simulator\obj\Debug\net6.0\Generator.AssemblyInfoInputs.cache
+C:\Users\CompieCourse\Desktop\BuisnessProject\Simulator\obj\Debug\net6.0\Generator.AssemblyInfo.cs
+C:\Users\CompieCourse\Desktop\BuisnessProject\Simulator\obj\Debug\net6.0\Generator.csproj.CoreCompileInputs.cache
+C:\Users\CompieCourse\Desktop\BuisnessProject\Simulator\obj\Debug\net6.0\Generator.csproj.CopyComplete
+C:\Users\CompieCourse\Desktop\BuisnessProject\Simulator\obj\Debug\net6.0\Generator.dll
+C:\Users\CompieCourse\Desktop\BuisnessProject\Simulator\obj\Debug\net6.0\refint\Generator.dll
+C:\Users\CompieCourse\Desktop\BuisnessProject\Simulator\obj\Debug\net6.0\Generator.pdb
+C:\Users\CompieCourse\Desktop\BuisnessProject\Simulator\obj\Debug\net6.0\ref\Generator.dll
