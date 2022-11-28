@@ -34,7 +34,6 @@ namespace BuisnessLogic
             get { return order!; }
             set { 
                 order = value;
-                Console.WriteLine($"The order is {order.Id}");
                 Task.Run(() => StartCustomerHandling());
                 StartOrderHandling();
             }
@@ -95,6 +94,7 @@ namespace BuisnessLogic
         private void CustomerEnter(Customer customer)
         {
             serviceStationList[chooseQueueForEnquque.GetQueueIndex(serviceStationList)].Customers!.Enqueue(customer);
+            // send customers (queues) to clients -------------------
             Console.WriteLine($"Customer {customer.Id} Is enter to queue");
         }
         private async Task StartCustomerHandling()
@@ -110,6 +110,7 @@ namespace BuisnessLogic
             if (customer == null) return;
             Order =  Task.Run(() =>  customersHandling.CustomerHandlingAsync(customer)).Result;
             ordersToPrepare.Add(Order);
+            //send orders data to client; ------------
         }
         private async void StartOrderHandling()
         {
@@ -128,11 +129,14 @@ namespace BuisnessLogic
             ordersToPrepare.Remove(order);
             ordersToDelievery.Add(order);
             Task.Run(() => delieveryHandling.DelieveryHandler(order));
+
+            // send delievery data to clients---------
         }
 
         private void RemoveOrderFromDelieveryList(Order order) // this is a delegate, Invoked from Delievery Handling service
         {
             ordersToDelievery.Remove(order);
+            //send delievery data to clients------------
         }
 
         public List<ServiceStation> GetServiceStations()
