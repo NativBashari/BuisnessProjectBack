@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuisnessLogic", "BuisnessLogic\BuisnessLogic.csproj", "{0FC6D61F-6A7A-4D6D-9B62-D29A980F8D1C}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Models", "Models\Models.csproj", "{DDD13612-5201-4F29-89A4-33CCE0DD9B19}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DAL", "DAL\DAL.csproj", "{1BB23621-B3DE-414C-AF1D-4B520BF954F1}"
@@ -19,10 +17,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0FC6D61F-6A7A-4D6D-9B62-D29A980F8D1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0FC6D61F-6A7A-4D6D-9B62-D29A980F8D1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0FC6D61F-6A7A-4D6D-9B62-D29A980F8D1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0FC6D61F-6A7A-4D6D-9B62-D29A980F8D1C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DDD13612-5201-4F29-89A4-33CCE0DD9B19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DDD13612-5201-4F29-89A4-33CCE0DD9B19}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DDD13612-5201-4F29-89A4-33CCE0DD9B19}.Release|Any CPU.ActiveCfg = Release|Any CPU

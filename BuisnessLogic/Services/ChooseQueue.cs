@@ -9,7 +9,6 @@ namespace BuisnessLogic.Services
 {
     internal  class ChooseQueue
     {
-        Random r = new Random();
         int index = 0;
         public int GetQueueIndex(IList<ServiceStation> queues)
         {

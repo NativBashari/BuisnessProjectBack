@@ -1,4 +1,5 @@
-using BuisnessLogic;
+using BuisnessProjectAPI.BuisnessLogic;
+using BuisnessProjectAPI.DataSender;
 using BuisnessProjectAPI.HubConfig;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,7 +16,10 @@ builder.Services.AddCors(options =>
 
 // Add services to the container.
 builder.Services.AddSignalR();
-builder.Services.AddSingleton<MainLogic>();
+builder.Services.AddSingleton<IMainLogic,MainLogic>();
+builder.Services.AddSingleton<OrdersToDelieveryDataSender>();
+builder.Services.AddSingleton<OrdersToPrepareDataSender>();
+builder.Services.AddSingleton<ServiceStationsDataSender>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

@@ -11,6 +11,7 @@ namespace Models.DataModels
         public int Id { get; set; }
         public IList<Product>? Products { get; set; }
         public DateTime EstimatedTime { get; set; }
+        public bool IsFailed { get; set; }
 
     }
 }

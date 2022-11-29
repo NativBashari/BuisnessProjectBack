@@ -1,7 +1,6 @@
 ﻿using BuisnessLogic.Services;
 using DAL;
 using Generator;
-using Microsoft.AspNetCore.SignalR;
 using Models.DataModels;
 using Simulator;
 using System.Timers;
@@ -28,7 +27,7 @@ namespace BuisnessLogic
         private List<Order> ordersToPrepare; // need thread-safety data structure
         private List<Order> ordersToDelievery; // need thread-safety data structure
         
-
+        
         public Order Order
         {
             get { return order!; }
