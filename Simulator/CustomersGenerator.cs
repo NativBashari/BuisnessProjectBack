@@ -13,7 +13,7 @@ namespace Generator
 
         public Customer GenerateCustomer()
         {
-            return new Customer() { Id = counter += 1, OrderingTime = 3};
+            return new Customer() { Id = counter += 1, OrderingTime = 4};
         }
 
     }

@@ -1,10 +1,11 @@
-﻿using BuisnessProjectAPI.HubConfig;
+﻿using BuisnessProjectAPI.DataSender.Contracts;
+using BuisnessProjectAPI.HubConfig;
 using Microsoft.AspNetCore.SignalR;
 using Models.DataModels;
 
 namespace BuisnessProjectAPI.DataSender
 {
-    public class OrdersToPrepareDataSender
+    public class OrdersToPrepareDataSender : IOrdersToPrepareDataSender
     {
         IHubContext<OrdersToPrepareHub> _hubContext;
 

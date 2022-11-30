@@ -1,10 +1,11 @@
-﻿using BuisnessProjectAPI.HubConfig;
+﻿using BuisnessProjectAPI.DataSender.Contracts;
+using BuisnessProjectAPI.HubConfig;
 using Microsoft.AspNetCore.SignalR;
 using Models.DataModels;
 
 namespace BuisnessProjectAPI.DataSender
 {
-    public class OrdersToDelieveryDataSender
+    public class OrdersToDelieveryDataSender: IOrdersToDelieveryDataSender
     {
         private readonly IHubContext<OrdersToDelieveryHub> _hubContext;
 

@@ -1,4 +1,5 @@
 ﻿using BuisnessProjectAPI.DataSender;
+using BuisnessProjectAPI.DataSender.Contracts;
 using DAL;
 using Generator;
 using Models.DataModels;
@@ -28,9 +29,9 @@ namespace BuisnessProjectAPI.BuisnessLogic
         private List<Order> ordersToDelievery; // need thread-safety data structure
 
 
-        private readonly ServiceStationsDataSender _serviceStationsDataSender;
-        private readonly OrdersToPrepareDataSender _ordersToPrepareDataSender;
-        private readonly OrdersToDelieveryDataSender _ordersToDelieveryDataSender;
+        private readonly IServiceStationsDataSender _serviceStationsDataSender;
+        private readonly IOrdersToPrepareDataSender _ordersToPrepareDataSender;
+        private readonly IOrdersToDelieveryDataSender _ordersToDelieveryDataSender;
 
 
         public Order EnteredOrder
@@ -40,7 +41,7 @@ namespace BuisnessProjectAPI.BuisnessLogic
             {
                 enteredOrder = value;
                 Task.Run(() => StartCustomerHandling());
-                StartOrderHandlingAsync(enteredOrder);
+                Task.Run(() =>StartOrderHandlingAsync(enteredOrder));
             }
         }
 
@@ -59,7 +60,7 @@ namespace BuisnessProjectAPI.BuisnessLogic
             }
         }
 
-        public MainLogic(ServiceStationsDataSender serviceStationsDataSender, OrdersToPrepareDataSender ordersToPrepareDataSender, OrdersToDelieveryDataSender ordersToDelieveryDataSender)
+        public MainLogic(IServiceStationsDataSender serviceStationsDataSender, IOrdersToPrepareDataSender ordersToPrepareDataSender, IOrdersToDelieveryDataSender ordersToDelieveryDataSender)
         {
             _dataService = new DataService();
             buisness = _dataService.Buisness!;
@@ -113,16 +114,16 @@ namespace BuisnessProjectAPI.BuisnessLogic
             int selectedIndex;
             do
             {
-                selectedIndex = chooseQueueForDequque.GetQueueIndex(serviceStationList);
+                selectedIndex = chooseQueueForDequque.GetQueueIndex(serviceStationList!);
             }
-            while (serviceStationList[selectedIndex].Customers!.Count < 1);
+            while (serviceStationList![selectedIndex].Customers!.Count < 1);
             var customer = customersHandling.CustomerDequeue(serviceStationList[selectedIndex].Customers!);
             if (customer == null) return;
             Task.Run( () => customersHandling.CustomerHandlingAsync(customer));
         }
         private async Task StartOrderHandlingAsync(Order order)
         {
-            if (ordersHandling.CheckMaterialAvailability(EnteredOrder, buisness.Materials!)) //// TODO: buisness need to hold list of materials, not products.
+            if (ordersHandling.CheckMaterialAvailability(EnteredOrder, buisness.Materials!)) 
             {
                await Task.Run(() => ordersHandling.OrderHandlingAsync(order));
             }
