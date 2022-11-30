@@ -36,16 +36,6 @@ namespace BuisnessProjectAPI.Controllers
             Console.WriteLine("Logic continued");
             mainLogic.ContinueCustomers();
             return Ok("Logic continued");
-        }
-        //[HttpGet]
-        //[Route("Faster")]
-        //public IActionResult FasterSimulator()
-        //{
-        //    Console.WriteLine("Simulator is faster now");
-
-        //}
-        
-
-        
+        } 
     }
 }

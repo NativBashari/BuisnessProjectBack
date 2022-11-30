@@ -1,7 +1,6 @@
 ﻿using BuisnessProjectAPI.DataSender;
 using DAL;
 using Generator;
-using Microsoft.AspNetCore.Razor.TagHelpers;
 using Models.DataModels;
 using Simulator;
 using System.Timers;
@@ -23,7 +22,7 @@ namespace BuisnessProjectAPI.BuisnessLogic
         readonly DelieveryHandling delieveryHandling;
         Buisness buisness;
         private Customer? enteredCustomer;
-        private Order? order;
+        private Order? enteredOrder;
         private List<ServiceStation>? serviceStationList;
         private List<Order> ordersToPrepare; // need thread-safety data structure
         private List<Order> ordersToDelievery; // need thread-safety data structure
@@ -34,14 +33,14 @@ namespace BuisnessProjectAPI.BuisnessLogic
         private readonly OrdersToDelieveryDataSender _ordersToDelieveryDataSender;
 
 
-        public Order Order
+        public Order EnteredOrder
         {
-            get { return order!; }
+            get { return enteredOrder!; }
             set
             {
-                order = value;
+                enteredOrder = value;
                 Task.Run(() => StartCustomerHandling());
-                StartOrderHandling(order);
+                StartOrderHandlingAsync(enteredOrder);
             }
         }
 
@@ -72,7 +71,7 @@ namespace BuisnessProjectAPI.BuisnessLogic
             delieveryHandling = new DelieveryHandling(RemoveOrderFromDelieveryList, buisness.DelieveryTime);
             timerLoop = new Timer();
             timerLoop.Elapsed += GetCustomerWithOrder;
-            timerLoop.Interval = 7000;
+            timerLoop.Interval = 5500;
             timerLoop.Enabled = true;
             ordersToPrepare = new List<Order>();
             ordersToDelievery = new List<Order>();
@@ -96,7 +95,7 @@ namespace BuisnessProjectAPI.BuisnessLogic
         private void GetCustomerWithOrder(object? sender, ElapsedEventArgs e)
         {
             var customer = _customersGenerator.GenerateCustomer();
-            var order = _ordersGenerator.GenerateOrder(buisness.Products!);
+            var order = _ordersGenerator.GenerateOrder(_dataService.GenerateProducts());
             customer.Order = order;
             EnteredCustomer = customer;
         }
@@ -121,17 +120,17 @@ namespace BuisnessProjectAPI.BuisnessLogic
             if (customer == null) return;
             Task.Run( () => customersHandling.CustomerHandlingAsync(customer));
         }
-        private void StartOrderHandling(Order order)
+        private async Task StartOrderHandlingAsync(Order order)
         {
-            if (ordersHandling.CheckMaterialAvailability(Order, _dataService.Materials!))
+            if (ordersHandling.CheckMaterialAvailability(EnteredOrder, _dataService.materials!)) //// TODO: buisness need to hold list of materials, not products.
             {
-                Task.Run(() => ordersHandling.OrderHandlingAsync(order));
+               await Task.Run(() => ordersHandling.OrderHandlingAsync(order));
             }
             else
             {
                 order.IsFailed = true;
                 Console.WriteLine("Order failed");
-                Task.Run(() =>RemoveFailedOrderFromList(order));
+                await Task.Run(() =>RemoveFailedOrderFromList(order));
                 return;
             }
         }
@@ -142,7 +141,7 @@ namespace BuisnessProjectAPI.BuisnessLogic
         }
         private void AddOrderToPreparingList(Order order) // this is a delegate, Invoked from OrdersHandling service
         {
-            Order = order;
+            EnteredOrder = order;
             ordersToPrepare.Add(order);
             _ordersToPrepareDataSender.SendOrdersData(ordersToPrepare);
         }
@@ -180,14 +179,6 @@ namespace BuisnessProjectAPI.BuisnessLogic
         public void ContinueCustomers()
         {
             this.timerLoop.Start();
-        }
-        public void FastSimulator()
-        {
-            this.timerLoop.Interval = 3000;
-            //do the ordering time faster 
-            // do the proccessing time faster
-            // do the delievery time faster
-
         }
     }
 }
