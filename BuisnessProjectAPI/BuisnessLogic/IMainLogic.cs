@@ -5,5 +5,6 @@
 
         void PauseCustomers();
         void ContinueCustomers();
+        void CloseServiceStation(int id);
     }
 }

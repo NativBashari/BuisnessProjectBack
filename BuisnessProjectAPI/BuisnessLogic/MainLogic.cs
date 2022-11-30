@@ -72,7 +72,7 @@ namespace BuisnessProjectAPI.BuisnessLogic
             delieveryHandling = new DelieveryHandling(RemoveOrderFromDelieveryList, buisness.DelieveryTime);
             timerLoop = new Timer();
             timerLoop.Elapsed += GetCustomerWithOrder;
-            timerLoop.Interval = 5500;
+            timerLoop.Interval = 1000; //bestCase: 5500
             timerLoop.Enabled = true;
             ordersToPrepare = new List<Order>();
             ordersToDelievery = new List<Order>();
@@ -112,11 +112,20 @@ namespace BuisnessProjectAPI.BuisnessLogic
         {
             customersCounter++;
             int selectedIndex;
+            try
+            {
             do
             {
                 selectedIndex = chooseQueueForDequque.GetQueueIndex(serviceStationList!);
             }
             while (serviceStationList![selectedIndex].Customers!.Count < 1);
+
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex);
+                return;
+            }
             var customer = customersHandling.CustomerDequeue(serviceStationList[selectedIndex].Customers!);
             if (customer == null) return;
             Task.Run( () => customersHandling.CustomerHandlingAsync(customer));
@@ -181,5 +190,18 @@ namespace BuisnessProjectAPI.BuisnessLogic
         {
             this.timerLoop.Start();
         }
+
+        public void CloseServiceStation(int id)
+        {
+            ChooseQueue chooseQueue = new ChooseQueue();
+            var serviceStation = serviceStationList!.FirstOrDefault(s => s.Id == id);
+            var customers = serviceStation!.Customers;
+            serviceStationList!.Remove(serviceStation!);
+            foreach(var c in customers!)
+            {
+                serviceStationList[chooseQueue.GetQueueIndex(serviceStationList)].Customers!.Enqueue(c);
+            }
+        }
+
     }
 }
