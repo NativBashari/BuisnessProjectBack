@@ -122,7 +122,7 @@ namespace BuisnessProjectAPI.BuisnessLogic
         }
         private async Task StartOrderHandlingAsync(Order order)
         {
-            if (ordersHandling.CheckMaterialAvailability(EnteredOrder, _dataService.materials!)) //// TODO: buisness need to hold list of materials, not products.
+            if (ordersHandling.CheckMaterialAvailability(EnteredOrder, buisness.Materials!)) //// TODO: buisness need to hold list of materials, not products.
             {
                await Task.Run(() => ordersHandling.OrderHandlingAsync(order));
             }

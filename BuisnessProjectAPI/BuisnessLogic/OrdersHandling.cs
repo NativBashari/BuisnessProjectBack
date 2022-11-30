@@ -19,7 +19,7 @@ namespace BuisnessProjectAPI.BuisnessLogic
             semaphore = new Semaphore(numOfProductionSlots, numOfProductionSlots);
         }
 
-        public bool CheckMaterialAvailability(Order order, List<Material> materials)
+        public bool CheckMaterialAvailability(Order order, IList<Material> materials)
         {
             foreach (Product product in order.Products!)
             {
