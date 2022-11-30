@@ -16,7 +16,7 @@ namespace DAL
 
         private void GenearateBuisness()
         {
-            this.Buisness = new Buisness() { Id = 1, Name = "Restaurant", Materials = materials, ProductionSlots = 1 , ServiceStations = 2, DelieveryTime = 10};
+            this.Buisness = new Buisness() { Id = 1, Name = "Restaurant", Materials = materials, ProductionSlots = 2 , ServiceStations = 4, DelieveryTime = 10};
         }
 
         private List<Material> GenerateMaterials()

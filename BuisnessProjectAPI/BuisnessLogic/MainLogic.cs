@@ -25,8 +25,8 @@ namespace BuisnessProjectAPI.BuisnessLogic
         private Customer? enteredCustomer;
         private Order? enteredOrder;
         private List<ServiceStation>? serviceStationList;
-        private List<Order> ordersToPrepare; // need thread-safety data structure
-        private List<Order> ordersToDelievery; // need thread-safety data structure
+        private List<Order> ordersToPrepare; 
+        private List<Order> ordersToDelievery;
 
 
         private readonly IServiceStationsDataSender _serviceStationsDataSender;
@@ -53,10 +53,10 @@ namespace BuisnessProjectAPI.BuisnessLogic
                 enteredCustomer = value;
                 Console.WriteLine($"Customer {enteredCustomer.Id} entered the restaurant");
                 CustomerEnter(enteredCustomer);
-                if (customersCounter < 1)
+               if (customersCounter < 1)
                 {
                     Task.Run(() => StartCustomerHandling()); // Only for first call
-                }
+               }
             }
         }
 
@@ -72,13 +72,13 @@ namespace BuisnessProjectAPI.BuisnessLogic
             delieveryHandling = new DelieveryHandling(RemoveOrderFromDelieveryList, buisness.DelieveryTime);
             timerLoop = new Timer();
             timerLoop.Elapsed += GetCustomerWithOrder;
-            timerLoop.Interval = 1000; //bestCase: 5500
+            timerLoop.Interval = 3000; 
             timerLoop.Enabled = true;
             ordersToPrepare = new List<Order>();
             ordersToDelievery = new List<Order>();
             chooseQueueForEnquque = new ChooseQueue();
             chooseQueueForDequque = new ChooseQueue();
-
+            //Data senders
             _serviceStationsDataSender= serviceStationsDataSender;
             _ordersToPrepareDataSender= ordersToPrepareDataSender;
             _ordersToDelieveryDataSender = ordersToDelieveryDataSender;
@@ -103,7 +103,8 @@ namespace BuisnessProjectAPI.BuisnessLogic
 
         private void CustomerEnter(Customer customer)
         {
-            serviceStationList![chooseQueueForEnquque.GetQueueIndex(serviceStationList)].Customers!.Enqueue(customer);
+            //TODO: Exeption handling
+            serviceStationList![chooseQueueForEnquque.GetQueueIndex(serviceStationList)].Customers!.Enqueue(customer); ///Exeption whenever a queue closed , Maybe stop the interval and then continue afte the closing
             // send customers (queues) to clients -------------------
             _serviceStationsDataSender.SendServiceStationsData(serviceStationList);
             Console.WriteLine($"Customer {customer.Id} Is enter to queue");
@@ -111,24 +112,7 @@ namespace BuisnessProjectAPI.BuisnessLogic
         private void StartCustomerHandling()
         {
             customersCounter++;
-            int selectedIndex;
-            try
-            {
-            do
-            {
-                selectedIndex = chooseQueueForDequque.GetQueueIndex(serviceStationList!);
-            }
-            while (serviceStationList![selectedIndex].Customers!.Count < 1);
-
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex);
-                return;
-            }
-            var customer = customersHandling.CustomerDequeue(serviceStationList[selectedIndex].Customers!);
-            if (customer == null) return;
-            Task.Run( () => customersHandling.CustomerHandlingAsync(customer));
+            Task.Run( () => customersHandling.CustomerHandlingAsync(serviceStationList));
         }
         private async Task StartOrderHandlingAsync(Order order)
         {
@@ -149,19 +133,19 @@ namespace BuisnessProjectAPI.BuisnessLogic
         {
             ordersToPrepare.Remove(order);
         }
-        private void AddOrderToPreparingList(Order order) // this is a delegate, Invoked from OrdersHandling service
+        private void AddOrderToPreparingList(Order order) // An action , Invoked from Cutomers Handling service
         {
             EnteredOrder = order;
             ordersToPrepare.Add(order);
             _ordersToPrepareDataSender.SendOrdersData(ordersToPrepare);
         }
 
-        private void RemoveOrderFromPreparingList(Order order) // this is a delegate, Invoked from OrdersHandling service
+        private void RemoveOrderFromPreparingList(Order order) // An action , Invoked from OrdersHandling service
         {
             ordersToPrepare.Remove(order);
             _ordersToPrepareDataSender.SendOrdersData(ordersToPrepare);
         }
-        private void AddOrderToDelieveryList(Order order) // this is a delegate, Invoked from OrdersHandling service
+        private void AddOrderToDelieveryList(Order order) // An action , Invoked from OrdersHandling service
         {     
             ordersToDelievery.Add(order);
             Task.Run(() => delieveryHandling.DelieveryHandler(order));
@@ -169,7 +153,7 @@ namespace BuisnessProjectAPI.BuisnessLogic
             _ordersToDelieveryDataSender.SendDelieveryData(ordersToDelievery);
         }
 
-        private void RemoveOrderFromDelieveryList(Order order) // this is a delegate, Invoked from Delievery Handling service
+        private void RemoveOrderFromDelieveryList(Order order) // An action , Invoked from Delievery Handling service
         {
             ordersToDelievery.Remove(order);
             //send delievery data to clients------------
@@ -193,14 +177,23 @@ namespace BuisnessProjectAPI.BuisnessLogic
 
         public void CloseServiceStation(int id)
         {
-            ChooseQueue chooseQueue = new ChooseQueue();
-            var serviceStation = serviceStationList!.FirstOrDefault(s => s.Id == id);
-            var customers = serviceStation!.Customers;
-            serviceStationList!.Remove(serviceStation!);
-            foreach(var c in customers!)
+            if (serviceStationList.Count > 1)
             {
-                serviceStationList[chooseQueue.GetQueueIndex(serviceStationList)].Customers!.Enqueue(c);
+                timerLoop.Stop();
+                ChooseQueue chooseQueue = new ChooseQueue();
+                var serviceStation = serviceStationList!.FirstOrDefault(s => s.Id == id);
+                var customers = serviceStation!.Customers;
+                serviceStationList!.Remove(serviceStation!);
+                foreach (var c in customers!)
+                {
+                    serviceStationList[chooseQueue.GetQueueIndex(serviceStationList)].Customers!.Enqueue(c);
+                }
+                timerLoop.Start();
+                _serviceStationsDataSender.SendServiceStationsData(serviceStationList);
             }
+            else
+                return;
+          
         }
 
     }
