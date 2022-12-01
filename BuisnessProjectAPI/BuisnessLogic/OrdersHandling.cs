@@ -36,7 +36,7 @@ namespace BuisnessProjectAPI.BuisnessLogic
             return true;
         }
 
-        public  async Task OrderHandlingAsync(Order order)
+        public async Task OrderHandlingAsync(Order order)
         {
             List<Task> tasks = new List<Task>();
             foreach (var product in order.Products!) // Need to await to all Tasks

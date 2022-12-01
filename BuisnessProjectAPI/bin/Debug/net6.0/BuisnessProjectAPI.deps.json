@@ -74,6 +74,7 @@
       },
       "Generator/1.0.0": {
         "dependencies": {
+          "DAL": "1.0.0",
           "Models": "1.0.0"
         },
         "runtime": {

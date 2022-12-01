@@ -7,7 +7,7 @@ namespace BuisnessProjectAPI.BuisnessLogic
         int index = 0;
         public int GetQueueIndex(IList<ServiceStation> queues)
         {
-            if (queues.Count - 1 == index)
+            if (queues.Count - 1 <= index)
             {
                 index = 0;
                 return index;

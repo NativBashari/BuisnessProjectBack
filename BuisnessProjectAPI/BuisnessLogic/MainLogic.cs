@@ -16,7 +16,6 @@ namespace BuisnessProjectAPI.BuisnessLogic
         ChooseQueue chooseQueueForEnquque;
         ChooseQueue chooseQueueForDequque;
         readonly DataService _dataService;
-        readonly OrdersGenerator _ordersGenerator;
         readonly CustomersGenerator _customersGenerator;
         readonly CustomersHandling customersHandling;
         readonly OrdersHandling ordersHandling;
@@ -53,8 +52,8 @@ namespace BuisnessProjectAPI.BuisnessLogic
                 enteredCustomer = value;
                 Console.WriteLine($"Customer {enteredCustomer.Id} entered the restaurant");
                 CustomerEnter(enteredCustomer);
-               if (customersCounter < 1)
-                {
+              if (customersCounter < 1)
+               {
                     Task.Run(() => StartCustomerHandling()); // Only for first call
                }
             }
@@ -65,14 +64,13 @@ namespace BuisnessProjectAPI.BuisnessLogic
             _dataService = new DataService();
             buisness = _dataService.Buisness!;
             CreateServiceStations();
-            _ordersGenerator = new OrdersGenerator();
             _customersGenerator = new CustomersGenerator();
-            customersHandling = new CustomersHandling(buisness.ServiceStations, AddOrderToPreparingList);
+            customersHandling = new CustomersHandling(buisness.ServiceStations, AddOrderToPreparingList, new OrdersGenerator(_dataService));
             ordersHandling = new OrdersHandling(buisness.ProductionSlots, AddOrderToDelieveryList, RemoveOrderFromPreparingList, UpdateOrdersState);
             delieveryHandling = new DelieveryHandling(RemoveOrderFromDelieveryList, buisness.DelieveryTime);
             timerLoop = new Timer();
-            timerLoop.Elapsed += GetCustomerWithOrder;
-            timerLoop.Interval = 3000; 
+            timerLoop.Elapsed += GetCustomer;
+            timerLoop.Interval = 2000; 
             timerLoop.Enabled = true;
             ordersToPrepare = new List<Order>();
             ordersToDelievery = new List<Order>();
@@ -93,26 +91,27 @@ namespace BuisnessProjectAPI.BuisnessLogic
             }
         }
 
-        private void GetCustomerWithOrder(object? sender, ElapsedEventArgs e)
+        private void GetCustomer(object? sender, ElapsedEventArgs e)
         {
             var customer = _customersGenerator.GenerateCustomer();
-            var order = _ordersGenerator.GenerateOrder(_dataService.GenerateProducts());
-            customer.Order = order;
             EnteredCustomer = customer;
         }
 
         private void CustomerEnter(Customer customer)
         {
-            //TODO: Exeption handling
-            serviceStationList![chooseQueueForEnquque.GetQueueIndex(serviceStationList)].Customers!.Enqueue(customer); ///Exeption whenever a queue closed , Maybe stop the interval and then continue afte the closing
+            try
+            {
+            serviceStationList![chooseQueueForEnquque.GetQueueIndex(serviceStationList)].Customers!.Enqueue(customer); 
+            }
+            catch (Exception ex) { Console.WriteLine(ex); }
             // send customers (queues) to clients -------------------
-            _serviceStationsDataSender.SendServiceStationsData(serviceStationList);
+            _serviceStationsDataSender.SendServiceStationsData(serviceStationList!);
             Console.WriteLine($"Customer {customer.Id} Is enter to queue");
         }
-        private void StartCustomerHandling()
+        private async Task StartCustomerHandling()
         {
             customersCounter++;
-            Task.Run( () => customersHandling.CustomerHandlingAsync(serviceStationList));
+            Task.Run(() => customersHandling.CustomerHandlingAsync(serviceStationList!)); // Not using await because it need to run asynchronusly, The semaphore is limit the number of tasks by the service station count
         }
         private async Task StartOrderHandlingAsync(Order order)
         {
@@ -177,7 +176,7 @@ namespace BuisnessProjectAPI.BuisnessLogic
 
         public void CloseServiceStation(int id)
         {
-            if (serviceStationList.Count > 1)
+            if (serviceStationList!.Count > 1)
             {
                 timerLoop.Stop();
                 ChooseQueue chooseQueue = new ChooseQueue();
@@ -191,9 +190,6 @@ namespace BuisnessProjectAPI.BuisnessLogic
                 timerLoop.Start();
                 _serviceStationsDataSender.SendServiceStationsData(serviceStationList);
             }
-            else
-                return;
-          
         }
 
     }

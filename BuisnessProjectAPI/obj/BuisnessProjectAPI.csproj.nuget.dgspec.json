@@ -216,6 +216,9 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
+              "C:\\Users\\CompieCourse\\Desktop\\BuisnessProject\\DAL\\DAL.csproj": {
+                "projectPath": "C:\\Users\\CompieCourse\\Desktop\\BuisnessProject\\DAL\\DAL.csproj"
+              },
               "C:\\Users\\CompieCourse\\Desktop\\BuisnessProject\\Models\\Models.csproj": {
                 "projectPath": "C:\\Users\\CompieCourse\\Desktop\\BuisnessProject\\Models\\Models.csproj"
               }
