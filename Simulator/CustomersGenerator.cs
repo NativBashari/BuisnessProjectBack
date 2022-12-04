@@ -20,7 +20,7 @@ namespace Generator
 
         private int GenerateMoney()
         {
-            return r.Next(30,61);
+            return r.Next(55,80);
         }
 
     }

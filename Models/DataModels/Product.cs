@@ -15,6 +15,6 @@ namespace Models.DataModels
         public int Priority { get; set; }
         public string? Image { get; set; }
         public int Price { get; set; }
-        public bool IsDone { get; set; } = false;
+        public bool IsDone { get; set; }
     }
 }

@@ -14,17 +14,16 @@ namespace Simulator
         public Order GenerateOrder()
         {
             var seconds = 0;
-            var productsCopy = new List<Product>(products);
-            foreach (var product in productsCopy)
+            foreach (var product in products)
             {
                 seconds += product.DeliveryTime;
             }
-            return new Order { Id = counter += 1 , EstimatedTime = DateTime.Now.AddSeconds(seconds), Products= GenerateProducts() , Price = CulcPrice(products)};
+            return new Order { Id = counter += 1, EstimatedTime = DateTime.Now.AddSeconds(seconds), Products = GenerateProducts(), Price = CulcPrice(products) };
         }
-        
+
         private int CulcPrice(IList<Product> products)
         {
-            int price =0;
+            int price = 0;
             foreach (var item in products)
             {
                 price += item.Price;
@@ -34,9 +33,12 @@ namespace Simulator
 
         private IList<Product> GenerateProducts()
         {
-            List<Product> product = new List<Product>(products);
+            List<Product> product = new List<Product>();
+            foreach(Product p in products)
+            {
+                product.Add(new Product() {Id = p.Id , Name = p.Name , Price = p.Price , DeliveryTime = p.DeliveryTime , Image = p.Image , IsDone = false  , Priority = p.Priority, Materials = p.Materials });
+            }
             return product;
-           
         }
     }
 }
