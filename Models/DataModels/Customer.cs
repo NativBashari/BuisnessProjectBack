@@ -12,5 +12,6 @@ namespace Models.DataModels
         public int OrderingTime { get; set; }
         public Order? Order { get; set; }
         public int AvailableMoney { get; set; }
+        public int Priority { get; set; }
     }
 }

@@ -46,6 +46,7 @@ namespace BuisnessProjectAPI.BuisnessLogic
             await Task.WhenAll(tasks);
             RemoveOrderFromPreparing.Invoke(order);
             Console.WriteLine($"Order {order.Id} complete succesfully");
+            order.IsDelievery = true;
             addOrderToDelieveryAction.Invoke(order);
         }
 

@@ -18,7 +18,7 @@ namespace Simulator
             {
                 seconds += product.DeliveryTime;
             }
-            return new Order { Id = counter += 1, EstimatedTime = DateTime.Now.AddSeconds(seconds), Products = GenerateProducts(), Price = CulcPrice(products) };
+            return new Order { Id = counter += 1, EstimatedTime = DateTime.Now.AddSeconds(seconds), Products = GenerateProducts(), Price = CulcPrice(products), IsFailed = IsFailed()};
         }
 
         private int CulcPrice(IList<Product> products)
@@ -39,6 +39,12 @@ namespace Simulator
                 product.Add(new Product() {Id = p.Id , Name = p.Name , Price = p.Price , DeliveryTime = p.DeliveryTime , Image = p.Image , IsDone = false  , Priority = p.Priority, Materials = p.Materials });
             }
             return product;
+        }
+
+        private bool IsFailed()
+        {
+            if (counter % 7 == 0) return true;
+            return false;
         }
     }
 }

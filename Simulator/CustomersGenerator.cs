@@ -14,9 +14,14 @@ namespace Generator
 
         public Customer GenerateCustomer()
         {
-            return new Customer() { Id = counter += 1, OrderingTime = 5, AvailableMoney = GenerateMoney()};
+            return new Customer() { Id = counter += 1, OrderingTime = 5, AvailableMoney = GenerateMoney(), Priority = IsCelebrity()};
         }
 
+        private int IsCelebrity()
+        {
+            if (counter % 15 == 0) return 1;
+            return 0;
+        }
 
         private int GenerateMoney()
         {

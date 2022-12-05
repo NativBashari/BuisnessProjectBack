@@ -6,13 +6,11 @@ namespace BuisnessProjectAPI.BuisnessLogic
     public class CustomersHandling
     {
         OrdersGenerator ordersGenerator;
-        private readonly int numOfQueues;
         Action<Order> AddOrderToPreparingList;
         ChooseQueue chooseQueueForDequque;
         Semaphore semaphore;
         public CustomersHandling(int numOfQueues, Action<Order> AddOrderToPreparingList, OrdersGenerator ordersGenerator)
         {
-            this.numOfQueues = numOfQueues;
             semaphore = new Semaphore(numOfQueues, numOfQueues);
             this.AddOrderToPreparingList = AddOrderToPreparingList;
             chooseQueueForDequque = new ChooseQueue();

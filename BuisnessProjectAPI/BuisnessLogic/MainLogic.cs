@@ -14,7 +14,6 @@ namespace BuisnessProjectAPI.BuisnessLogic
         int customersCounter;
         Timer timerLoop;
         ChooseQueue chooseQueueForEnquque;
-        ChooseQueue chooseQueueForDequque;
         readonly DataService _dataService;
         readonly CustomersGenerator _customersGenerator;
         readonly CustomersHandling customersHandling;
@@ -52,7 +51,7 @@ namespace BuisnessProjectAPI.BuisnessLogic
                 enteredCustomer = value;
                 Console.WriteLine($"Customer {enteredCustomer.Id} entered the restaurant");
                 CustomerEnter(enteredCustomer);
-              if (customersCounter < 1)
+              if (customersCounter < 1 || enteredCustomer.Priority > 0) // If the customer is a celebrity, start handling immidiatly
                {
                     Task.Run(() => StartCustomerHandling()); // Only for first call
                }
@@ -67,15 +66,14 @@ namespace BuisnessProjectAPI.BuisnessLogic
             _customersGenerator = new CustomersGenerator();
             customersHandling = new CustomersHandling(buisness.ServiceStations, AddOrderToPreparingList, new OrdersGenerator(_dataService));
             ordersHandling = new OrdersHandling(buisness.ProductionSlots, AddOrderToDelieveryList, RemoveOrderFromPreparingList, UpdateOrdersState);
-            delieveryHandling = new DelieveryHandling(RemoveOrderFromDelieveryList, buisness.DelieveryTime);
+            delieveryHandling = new DelieveryHandling(RemoveOrderFromDelieveryList, buisness.DelieveryTime, Reproduce);
             timerLoop = new Timer();
             timerLoop.Elapsed += GetCustomer;
-            timerLoop.Interval = 3000; 
+            timerLoop.Interval = 2800; 
             timerLoop.Enabled = true;
             ordersToPrepare = new List<Order>();
             ordersToDelievery = new List<Order>();
             chooseQueueForEnquque = new ChooseQueue();
-            chooseQueueForDequque = new ChooseQueue();
             //Data senders
             _serviceStationsDataSender= serviceStationsDataSender;
             _ordersToPrepareDataSender= ordersToPrepareDataSender;
@@ -115,6 +113,12 @@ namespace BuisnessProjectAPI.BuisnessLogic
         }
         private async Task StartOrderHandlingAsync(Order order)
         {
+            if (order.IsFailed)
+            {
+                Console.WriteLine("Order failed");
+                await Task.Run(() => RemoveFailedOrderFromList(order));
+                return;
+            }
             if (ordersHandling.CheckMaterialAvailability(EnteredOrder, buisness.Materials!)) 
             {
                await Task.Run(() => ordersHandling.OrderHandlingAsync(order));
@@ -126,6 +130,12 @@ namespace BuisnessProjectAPI.BuisnessLogic
                 await Task.Run(() =>RemoveFailedOrderFromList(order));
                 return;
             }
+        }
+
+        private void Reproduce(Order order)
+        {
+            Console.WriteLine($"Order {order.Id} is Reproduce");
+            Task.Run(() => StartOrderHandlingAsync(order));
         }
 
         private void RemoveFailedOrderFromList(Order order)
