@@ -69,7 +69,7 @@ namespace BuisnessProjectAPI.BuisnessLogic
             delieveryHandling = new DelieveryHandling(RemoveOrderFromDelieveryList, buisness.DelieveryTime, Reproduce);
             timerLoop = new Timer();
             timerLoop.Elapsed += GetCustomer;
-            timerLoop.Interval = 2800; 
+            timerLoop.Interval = 4800; 
             timerLoop.Enabled = true;
             ordersToPrepare = new List<Order>();
             ordersToDelievery = new List<Order>();

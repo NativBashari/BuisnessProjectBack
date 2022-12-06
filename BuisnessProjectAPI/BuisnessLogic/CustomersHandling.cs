@@ -44,6 +44,7 @@ namespace BuisnessProjectAPI.BuisnessLogic
                     return;
                 }
                 var customer = CustomerDequeue(serviceStationList[selectedIndex].Customers!);
+                if (customer == null) return;
                 Console.WriteLine($"Customer {customer.Id} Can order now");
                 await Task.Delay(customer.OrderingTime * 1000);
 
