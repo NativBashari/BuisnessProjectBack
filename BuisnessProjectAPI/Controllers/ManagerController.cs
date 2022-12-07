@@ -1,6 +1,7 @@
 ﻿using BuisnessProjectAPI.BuisnessLogic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Models.DataModels;
 
 namespace BuisnessProjectAPI.Controllers
 {
@@ -18,6 +19,7 @@ namespace BuisnessProjectAPI.Controllers
         [Route("Start")]
         public IActionResult StartSimulator()
         {
+            mainLogic.StartLogic();
             Console.WriteLine("Logic Started");
             return Ok("LogicStarted");
         }
@@ -36,6 +38,14 @@ namespace BuisnessProjectAPI.Controllers
             Console.WriteLine("Logic continued");
             mainLogic.ContinueCustomers();
             return Ok("Logic continued");
+        }
+
+        [HttpPost]
+        public IActionResult SetBuisness(Buisness buisness)
+        {
+            mainLogic.SetBuisnsess(buisness);
+            Console.WriteLine(buisness.Name);
+            return Ok(buisness);
         }
 
         

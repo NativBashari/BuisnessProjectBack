@@ -15,16 +15,17 @@ namespace BuisnessProjectAPI.BuisnessLogic
         Timer timerLoop;
         ChooseQueue chooseQueueForEnquque;
         readonly DataService _dataService;
-        readonly CustomersGenerator _customersGenerator;
-        readonly CustomersHandling customersHandling;
-        readonly OrdersHandling ordersHandling;
-        readonly DelieveryHandling delieveryHandling;
+        CustomersGenerator _customersGenerator;
+        CustomersHandling customersHandling;
+        OrdersHandling ordersHandling;
+        DelieveryHandling delieveryHandling;
         Buisness buisness;
         private Customer? enteredCustomer;
         private Order? enteredOrder;
         private List<ServiceStation>? serviceStationList;
         private List<Order> ordersToPrepare; 
         private List<Order> ordersToDelievery;
+        Buisness Buisness;
 
 
         private readonly IServiceStationsDataSender _serviceStationsDataSender;
@@ -61,16 +62,7 @@ namespace BuisnessProjectAPI.BuisnessLogic
         public MainLogic(IServiceStationsDataSender serviceStationsDataSender, IOrdersToPrepareDataSender ordersToPrepareDataSender, IOrdersToDelieveryDataSender ordersToDelieveryDataSender)
         {
             _dataService = new DataService();
-            buisness = _dataService.Buisness!;
-            CreateServiceStations();
             _customersGenerator = new CustomersGenerator();
-            customersHandling = new CustomersHandling(buisness.ServiceStations, AddOrderToPreparingList, new OrdersGenerator(_dataService));
-            ordersHandling = new OrdersHandling(buisness.ProductionSlots, AddOrderToDelieveryList, RemoveOrderFromPreparingList, UpdateOrdersState);
-            delieveryHandling = new DelieveryHandling(RemoveOrderFromDelieveryList, buisness.DelieveryTime, Reproduce);
-            timerLoop = new Timer();
-            timerLoop.Elapsed += GetCustomer;
-            timerLoop.Interval = 4800; 
-            timerLoop.Enabled = true;
             ordersToPrepare = new List<Order>();
             ordersToDelievery = new List<Order>();
             chooseQueueForEnquque = new ChooseQueue();
@@ -182,6 +174,26 @@ namespace BuisnessProjectAPI.BuisnessLogic
         public void ContinueCustomers()
         {
             this.timerLoop.Start();
+        }
+
+        public void SetBuisnsess(Buisness buisness)
+        {
+            this.buisness = buisness;
+            this.buisness.Materials = _dataService.materials;
+        }
+        public void StartLogic()
+        {
+            if(buisness != null)
+            {
+                CreateServiceStations();
+                customersHandling = new CustomersHandling(buisness.ServiceStations, AddOrderToPreparingList, new OrdersGenerator(_dataService));
+                ordersHandling = new OrdersHandling(buisness.ProductionSlots, AddOrderToDelieveryList, RemoveOrderFromPreparingList, UpdateOrdersState);
+                delieveryHandling = new DelieveryHandling(RemoveOrderFromDelieveryList, buisness.DelieveryTime, Reproduce);
+                timerLoop = new Timer();
+                timerLoop.Elapsed += GetCustomer;
+                timerLoop.Interval = buisness.CustomersEntryRate * 1000;
+                timerLoop.Enabled = true;
+            }
         }
 
         public void CloseServiceStation(int id)

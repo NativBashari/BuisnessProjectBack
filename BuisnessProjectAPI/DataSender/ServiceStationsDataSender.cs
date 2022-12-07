@@ -19,5 +19,7 @@ namespace BuisnessProjectAPI.DataSender
         {
             Task.Run(() =>  _hubContext.Clients.All.SendAsync("TransferServiceStationsData", serviceStations));
         }
+
+       
     }
 }
