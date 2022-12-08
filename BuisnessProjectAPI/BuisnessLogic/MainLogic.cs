@@ -101,7 +101,7 @@ namespace BuisnessProjectAPI.BuisnessLogic
         private async Task StartCustomerHandling()
         {
             customersCounter++;
-            Task.Run(() => customersHandling.CustomerHandlingAsync(serviceStationList!)); // Not using await because it need to run asynchronusly, The semaphore is limit the number of tasks by the service station count
+            Task.Run(() => customersHandling.CustomerHandlingAsync(serviceStationList!)); // Not using await because it need to run asynchronusly, The semaphore is limit the number of tasks by the service stations count
         }
         private async Task StartOrderHandlingAsync(Order order)
         {

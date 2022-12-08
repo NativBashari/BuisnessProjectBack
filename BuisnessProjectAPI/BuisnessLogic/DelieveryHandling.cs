@@ -23,8 +23,8 @@ namespace BuisnessProjectAPI.BuisnessLogic
             counter++;
            if(counter % 8 == 0)
             {
-                Console.WriteLine($"Order {order.Id} is failed in delievery !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                order.DelieveryFailed = true;
+               Console.WriteLine($"Order {order.Id} is failed in delievery !!!!!");
+               order.DelieveryFailed = true;
                RemoveOrderFromDelievery.Invoke(order);
                ReproduceFailedDelievery.Invoke(order);
                return;
